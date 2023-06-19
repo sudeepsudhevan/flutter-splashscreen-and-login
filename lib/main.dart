@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:splash/screens/splash.dart';
 
+const SAVE_KEY_NAME = 'UserLoggedIn';
+
 void main() {
-  runApp(Myapp());
+  runApp(MyApp());
 }
 
-class Myapp extends StatelessWidget {
-  const Myapp({super.key});
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {

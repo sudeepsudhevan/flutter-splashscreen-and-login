@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:splash/main.dart';
+import 'package:splash/screens/home.dart';
 import 'package:splash/screens/login.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -12,7 +15,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     // TODO: implement initState
-    gotoLogin();
+    checkUserLoggedIn();
     super.initState();
   }
 
@@ -39,13 +42,31 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> gotoLogin() async {
-    Future.delayed(Duration(seconds: 3), () {
-      Navigator.push(
+    await Future.delayed(
+      Duration(seconds: 3),
+      () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (ctx) => LoginScreen(),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> checkUserLoggedIn() async {
+    final _sharedPrefs = await SharedPreferences.getInstance();
+    final _userLoggedIn = _sharedPrefs.getBool(SAVE_KEY_NAME);
+    if (_userLoggedIn == null || _userLoggedIn == false) {
+      gotoLogin();
+    } else {
+      Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (ctx) => LoginScreen(),
+          builder: (ctx) => HomeScreen(),
         ),
       );
-    });
+    }
   }
 }

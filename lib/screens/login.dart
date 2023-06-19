@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:splash/main.dart';
+
+import 'package:splash/screens/home.dart';
 
 class LoginScreen extends StatefulWidget {
   LoginScreen({super.key});
@@ -32,13 +36,15 @@ class _LoginScreenState extends State<LoginScreen> {
                       border: OutlineInputBorder(),
                       hintText: 'Username',
                     ),
-                    validator: (_) {
-                      if (_isDataMatched) {
-                        return null;
-                      } else {
-                        return 'Error';
-                      }
-                    },
+                    // validator: (_) {
+                    //   if (_isDataMatched) {
+                    //     return null;
+                    //   } else {
+                    //     return 'Error';
+                    //   }
+                    // },
+                    validator: (value) =>
+                        value!.isEmpty ? 'Enter username' : null,
                   ),
                 ),
                 TextFormField(
@@ -48,13 +54,15 @@ class _LoginScreenState extends State<LoginScreen> {
                     border: OutlineInputBorder(),
                     hintText: 'Password',
                   ),
-                  validator: (_) {
-                    if (_isDataMatched) {
-                      return null;
-                    } else {
-                      return 'Error';
-                    }
-                  },
+                  // validator: (_) {
+                  //   if (_isDataMatched) {
+                  //     return null;
+                  //   } else {
+                  //     return 'Error';
+                  //   }
+                  // },
+                  validator: (value) =>
+                      value!.isEmpty ? 'Enter password' : null,
                 ),
                 const SizedBox(
                   height: 10,
@@ -71,8 +79,11 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     ElevatedButton.icon(
                       onPressed: () {
-                        _formKey.currentState!.validate();
-                        checkLogin(context);
+                        if (_formKey.currentState!.validate()) {
+                          checkLogin(context);
+                        } else {
+                          print('Data is not valid');
+                        }
                       },
                       icon: const Icon(Icons.login),
                       label: const Text('Login'),
@@ -87,45 +98,17 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  void checkLogin(BuildContext ctx) {
+  void checkLogin(BuildContext ctx) async {
     final _username = _usernameController.text;
     final _password = _passwordController.text;
     if (_username == _password) {
       //Go to home
+      final _sharedPrefs = await SharedPreferences.getInstance();
+      await _sharedPrefs.setBool(SAVE_KEY_NAME, true);
+
+      Navigator.pushReplacement(
+          ctx, MaterialPageRoute(builder: (ctx1) => HomeScreen()));
     } else {
-      final _errorMesssage = 'Username or password is incorrect';
-      //Snack bar
-      ScaffoldMessenger.of(ctx).showSnackBar(
-        SnackBar(
-          backgroundColor: Colors.red,
-          behavior: SnackBarBehavior.floating,
-          margin: const EdgeInsets.all(15),
-          content: Text(_errorMesssage),
-          duration: const Duration(seconds: 10),
-        ),
-      );
-
-      //Alert dialog
-
-      showDialog(
-        context: ctx,
-        builder: (ctx1) {
-          return AlertDialog(
-            title: Text('Error'),
-            content: Text(_errorMesssage),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(ctx1);
-                },
-                child: Text('close'),
-              ),
-            ],
-          );
-        },
-      );
-
-      //Show text
       setState(() {
         _isDataMatched = false;
       });
